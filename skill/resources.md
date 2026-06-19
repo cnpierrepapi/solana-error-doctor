@@ -18,8 +18,8 @@ Pin a **consistent set**, don't mix:
 |---|---|
 | Agave (CLI/validator) | Install the **latest official stable** (`release.anza.xyz/stable`) unless a project pins otherwise. |
 | Rust (platform-tools) | Comes with Agave; it's what compiles your program. Don't fight it — match deps to it (see `toolchain-build.md`). |
-| Anchor (on-chain `anchor-lang`) | 0.31+ through **1.x** (current **1.0.2**). Pin in `Anchor.toml` `[toolchain]`. |
-| `@coral-xyz/anchor` (client) | **Same minor** as on-chain `anchor-lang`. |
+| Anchor (on-chain `anchor-lang`) | 0.31+ through **1.x** (current **1.0.2**). Pin in `Anchor.toml` `[toolchain]`. **1.0 bundles its own toolchain** (targets Solana 3.x/Agave), removing much of this matrix. |
+| Anchor TS client | Match the on-chain version. **Anchor 1.0 renamed it `@coral-xyz/anchor` → `@anchor-lang/core`**; 0.31 and earlier use `@coral-xyz/anchor`. |
 | Lockfile | `cargo-build-sbf` may need **v3**; system Cargo ≥1.83 writes v4. Reconcile (see chapter). |
 | sBPF `--arch` | Build with the latest toolchain, emit the **highest version the cluster enables** (devnet has accepted `--arch v3`). |
 
@@ -29,7 +29,7 @@ Pin a **consistent set**, don't mix:
 ## Error-code quick reference
 
 - **2000–2999** — Anchor constraint errors: 2001 `HasOne`, 2002 `Signer`, 2003 `Raw`, 2004 `Owner`,
-  2006 `Seeds`, 2012 `Address`, 2019 `Space`.
+  2006 `Seeds`, 2012 `Address`, 2019 `Space`, 2040 `DuplicateMutableAccount` (new default in 1.0).
 - **3000–3999** — Anchor account errors: 3002 `AccountDiscriminatorMismatch`,
   3003 `AccountDidNotDeserialize`, 3004 `AccountDidNotSerialize`, 3012 `AccountNotInitialized`.
 - **4100** — `DeclaredProgramIdMismatch` (`anchor keys sync`).

@@ -17,7 +17,9 @@ Prefer **`transfer_checked`** (and `mint_to_checked`, `burn_checked`). It takes 
   for them).
 
 The classic `transfer` (no mint/decimals) still works for plain SPL but is the legacy path; new
-code should use the checked variants. `0x4` / `TokenError` on a transfer usually means owner or
+code should use the checked variants. **Anchor 1.0 deprecates plain `transfer`** — use
+`anchor_spl::token_interface` with `transfer_checked` so the same code works against both the Token
+and Token-2022 programs. `0x4` / `TokenError` on a transfer usually means an owner or
 amount/decimals mismatch.
 
 ---

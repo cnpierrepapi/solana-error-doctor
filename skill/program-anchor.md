@@ -112,6 +112,9 @@ hardcoded to 8 bytes everywhere). If you must store dynamically growing data, se
   `Account<'info, T>` (checks owner == your program **and** the discriminator), `Signer`,
   `Program`, and constraints (`has_one`, `address = …`, `constraint = …`). Only use
   `UncheckedAccount` with an explicit `/// CHECK:` justification and a manual check.
+- **Duplicate mutable accounts (`ConstraintDuplicateMutableAccount`, 2040 / 0x7f8):** **Anchor 1.0
+  rejects passing the same `mut` account twice by default.** If you legitimately need to, pass
+  distinct accounts or restructure the instruction; this was silently allowed before 1.0.
 
 ---
 
@@ -123,13 +126,24 @@ and the calling program owns it.
 ```rust
 let seeds = &[b"vault", authority.key().as_ref(), &[ctx.bumps.vault]];
 let signer = &[&seeds[..]];
-transfer(CpiContext::new_with_signer(token_program, accounts, signer), amount)?;
+// Anchor 1.0: CpiContext takes the program Pubkey (.key()), NOT an AccountInfo; plain
+// `transfer` is deprecated — use `transfer_checked` (mint + decimals).
+transfer_checked(
+    CpiContext::new_with_signer(token_program.key(), TransferChecked { mint, from, to, authority }, signer),
+    amount,
+    decimals,
+)?;
 ```
 
 **Errors you'll see if this is wrong:** "Cross-program invocation with unauthorized signer"
 or signature failures. Causes: seeds/bump don't match the PDA being signed for, or you used
-`CpiContext::new` (no signer) for a PDA-authority transfer. In Anchor 0.30+ the bumps are in
-`ctx.bumps.<account_name>`.
+`CpiContext::new` (no signer) for a PDA-authority transfer. Bumps live in
+`ctx.bumps.<account_name>` (0.30+).
+
+> **Version note:** on **Anchor 1.0**, `CpiContext::new`/`new_with_signer` take the program
+> `Pubkey` (`.key()`) and `transfer` is deprecated for `transfer_checked`. On **0.31 and earlier**
+> they take the `AccountInfo` and plain `transfer` still works. Match your version — passing the
+> wrong one is itself a common compile/runtime error.
 
 ---
 

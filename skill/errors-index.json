@@ -48,6 +48,14 @@
       "one_line": "An account marked Signer wasn't passed as a signer, or a PDA tried to sign without invoke_signed."
     },
     {
+      "id": "duplicate-mutable",
+      "signals": ["ConstraintDuplicateMutableAccount", "duplicate mutable account", "0x7f8", "error code 2040"],
+      "codes": [2040],
+      "layer": "program-runtime",
+      "chapter": "program-anchor.md#signer-owner",
+      "one_line": "Anchor 1.0 rejects passing the same mut account twice by default — pass distinct accounts or restructure."
+    },
+    {
       "id": "pda-cpi-signing",
       "signals": ["invoke_signed", "Cross-program invocation with unauthorized signer", "privilege escalation", "signer privilege escalated"],
       "codes": [],
