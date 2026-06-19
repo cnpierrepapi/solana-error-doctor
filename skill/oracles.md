@@ -57,9 +57,16 @@ let price = price_update.get_price_no_older_than(
 fetch-update routine to get an instruction that submits fresh signed oracle samples, and bundle it
 ahead of your program instruction in the same tx.
 
-**On-chain (`switchboard-on-demand` crate):** load the feed account, verify the update is recent,
-and read the result (value + std-dev/confidence). Apply the **same four checks** as Pyth: staleness
-(max age), expected feed/account, confidence/variance bound, and correct scaling.
+**On-chain (`switchboard-on-demand` crate, 0.13.x — VERIFY against your pinned version):** parse the
+feed account and read with a staleness-bounded call:
+```rust
+let feed = PullFeedAccountData::parse(feed_account.data.borrow())?;
+// max_staleness = max slots since the last update; min_samples = min oracle responses required
+let price: Decimal = feed.get_value(Clock::get()?.slot, MAX_STALENESS_SLOTS, MIN_SAMPLES, true)?;
+```
+Two differences from Pyth to keep straight: Switchboard returns a `rust_decimal::Decimal` (not an
+`i64` mantissa + exponent), and `get_value` takes a **raw slot (`u64`)**, not a `&Clock`. It enforces
+staleness (slots since update) and a minimum sample count for you; you still choose the bounds.
 
 ---
 
@@ -82,8 +89,10 @@ and read the result (value + std-dev/confidence). Apply the **same four checks**
 2. Is the read **staleness-bounded**? (`max_age`, not unbounded.)
 3. Is the **feed id / account asserted** against the one you expect?
 4. Is the **confidence/variance** checked and the **exponent** applied?
-5. Are you on the **right cluster** with a feed that actually publishes there (devnet feed ids ≠
-   mainnet)?
+5. Are you on the **right cluster**, and is a fresh update actually posted there? (Pyth **feed IDs
+   are global — identical across devnet and mainnet**; what differs per network is the receiver
+   program address and whether an update account has been posted on *that* cluster. Don't go hunting
+   for a "devnet feed id" — there isn't one.)
 
 ---
 

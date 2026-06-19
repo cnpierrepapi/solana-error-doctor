@@ -44,7 +44,7 @@ client uses `toArrayLike(Buffer, "be", 8)` (big-endian) while Rust uses `to_le_b
 
 ---
 
-## <a id="has-one"></a>"A has_one constraint was violated" — `ConstraintHasOne` (2003 / 0x7d3)
+## <a id="has-one"></a>"A has_one constraint was violated" — `ConstraintHasOne` (2001 / 0x7d1)
 
 `has_one = authority` means *the `authority` field stored on this account must equal the
 `authority` account you passed.* The error = they differ.
@@ -56,7 +56,7 @@ signer — pair it with `Signer` if you also need a signature.
 
 ---
 
-## <a id="discriminator"></a>`AccountDidNotDeserialize` / `AccountDiscriminatorMismatch` (3002 / 3003)
+## <a id="discriminator"></a>`AccountDiscriminatorMismatch` (3002) / `AccountDidNotDeserialize` (3003)
 
 Every Anchor account begins with an **8-byte discriminator** (hash of the account name).
 Deserialization fails when:
@@ -92,8 +92,13 @@ pub struct Counter {
 ```
 
 `8 +` is the discriminator; `INIT_SPACE` is the struct body (use `#[max_len(N)]` for `Vec`/
-`String`). Never hand-count if you can derive it. If you must store dynamically growing data,
-see realloc below.
+`String`). Never hand-count if you can derive it. On Anchor 0.31+ the **future-proof form** is
+`space = Counter::DISCRIMINATOR.len() + Counter::INIT_SPACE` (the discriminator is no longer
+hardcoded to 8 bytes everywhere). If you must store dynamically growing data, see realloc below.
+
+> The Anchor *constraint* code for an under-sized `space` is `ConstraintSpace` (**2019**), and a
+> failed write is `AccountDidNotSerialize` (**3004**). A raw "account data too small" surfaced at
+> the runtime layer is a Solana **runtime** error, not an Anchor `ErrorCode` — same fix either way.
 
 ---
 

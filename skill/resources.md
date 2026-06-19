@@ -18,7 +18,7 @@ Pin a **consistent set**, don't mix:
 |---|---|
 | Agave (CLI/validator) | Install the **latest official stable** (`release.anza.xyz/stable`) unless a project pins otherwise. |
 | Rust (platform-tools) | Comes with Agave; it's what compiles your program. Don't fight it — match deps to it (see `toolchain-build.md`). |
-| Anchor (on-chain `anchor-lang`) | 0.31.1+ / 0.32 on a current stack. Pin in `Anchor.toml` `[toolchain]`. |
+| Anchor (on-chain `anchor-lang`) | 0.31+ through **1.x** (current **1.0.2**). Pin in `Anchor.toml` `[toolchain]`. |
 | `@coral-xyz/anchor` (client) | **Same minor** as on-chain `anchor-lang`. |
 | Lockfile | `cargo-build-sbf` may need **v3**; system Cargo ≥1.83 writes v4. Reconcile (see chapter). |
 | sBPF `--arch` | Build with the latest toolchain, emit the **highest version the cluster enables** (devnet has accepted `--arch v3`). |
@@ -28,8 +28,10 @@ Pin a **consistent set**, don't mix:
 
 ## Error-code quick reference
 
-- **2000–2999** — Anchor constraint errors (2002 Signer, 2003 HasOne, 2006 Seeds…).
-- **3000–3999** — Anchor account errors (3002 discriminator, 3004 space/serialize…).
+- **2000–2999** — Anchor constraint errors: 2001 `HasOne`, 2002 `Signer`, 2003 `Raw`, 2004 `Owner`,
+  2006 `Seeds`, 2012 `Address`, 2019 `Space`.
+- **3000–3999** — Anchor account errors: 3002 `AccountDiscriminatorMismatch`,
+  3003 `AccountDidNotDeserialize`, 3004 `AccountDidNotSerialize`, 3012 `AccountNotInitialized`.
 - **4100** — `DeclaredProgramIdMismatch` (`anchor keys sync`).
 - **6000+ (0x1770+)** — your program's `#[error_code]` enum, in declaration order. Read the
   `#[msg("…")]`.

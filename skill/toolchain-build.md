@@ -133,7 +133,7 @@ Symptoms: `package … requires rustc 1.6x`, `proc_macro2 … source_file not fo
 feature. All are the same disease — mismatched toolchains.
 
 **Fix:** align to a **known-good matrix** rather than chasing individual crates.
-- Use a recent **Anchor 0.31.1+ / 0.32** with a matching **Agave** release.
+- Use a recent **Anchor (0.31+ through 1.x; current 1.0.2)** with a matching **Agave** release.
 - Pin via `[toolchain]` in `Anchor.toml` (Anchor reads `anchor_version`/`solana_version`).
 - Keep `@coral-xyz/anchor` (client) on the **same minor** as the on-chain `anchor-lang`.
 - When in doubt, install the latest official stable Agave + the Anchor that its release notes

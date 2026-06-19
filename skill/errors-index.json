@@ -4,7 +4,7 @@
   "anchor_error_code_base": {
     "framework_errors": "2000-3999 (Anchor's own constraint/account errors)",
     "custom_errors": "6000+ (0x1770+) — your program's #[error_code] enum, in declaration order",
-    "note": "Hex shown in logs: 6000=0x1770, 6001=0x1771, 2006=0x7d6, 2003=0x7d3, 3012=0x bc4. Convert hex->dec to map."
+    "note": "Hex shown in logs: 6000=0x1770, 6001=0x1771, 2006=0x7d6, 2001=0x7d1, 3002=0xbba, 3003=0xbbb, 3012=0xbc4. Convert hex->dec to map."
   },
   "entries": [
     {
@@ -17,8 +17,8 @@
     },
     {
       "id": "has-one",
-      "signals": ["A has one constraint was violated", "ConstraintHasOne", "0x7d3", "error code 2003"],
-      "codes": [2003],
+      "signals": ["A has one constraint was violated", "ConstraintHasOne", "0x7d1", "error code 2001"],
+      "codes": [2001],
       "layer": "program-runtime",
       "chapter": "program-anchor.md#has-one",
       "one_line": "The field on the loaded account doesn't equal the key of the account passed for it."
@@ -33,8 +33,8 @@
     },
     {
       "id": "account-space",
-      "signals": ["data too small", "AccountDataTooSmall", "failed to serialize", "AccountDidNotSerialize", "not enough space", "Trying to serialize"],
-      "codes": [3004],
+      "signals": ["data too small", "AccountDataTooSmall", "failed to serialize", "AccountDidNotSerialize", "ConstraintSpace", "not enough space", "Trying to serialize"],
+      "codes": [3004, 2019],
       "layer": "program-runtime",
       "chapter": "program-anchor.md#space",
       "one_line": "`space` omitted the 8-byte discriminator or undersized a field. Use 8 + InitSpace."
