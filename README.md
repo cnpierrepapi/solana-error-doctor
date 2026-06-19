@@ -16,6 +16,36 @@ ReferenceError: Buffer is not defined
 The Solana Error Doctor is the skill you reach for **when something breaks**. It maps a symptom to
 the one root cause and the verified fix, instead of a generic "here's how Anchor works" essay.
 
+## Example session
+
+```text
+> /solana-debug A seeds constraint was violated
+
+Diagnosis
+  ConstraintSeeds (2006 / 0x7d6) — the PDA your client passed doesn't match the address
+  the program re-derives from seeds = [...]. Almost always a seed *encoding* or *ordering*
+  mismatch; the classic case is a u64 seed serialized big-endian on the client but
+  little-endian (to_le_bytes) in the program.
+
+Fix
+  Make one derivation the source of truth and mirror it exactly on both sides:
+
+    // client (web3.js)
+    const [pda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("vault"), authority.toBuffer(), new BN(id).toArrayLike(Buffer, "le", 8)],
+      programId);
+
+    // program (Anchor)
+    #[account(seeds = [b"vault", authority.key().as_ref(), &id.to_le_bytes()], bump)]
+
+Verify
+  Log both addresses and assert equality BEFORE sending. If they differ, the seeds differ —
+  fix the seeds, don't touch program logic.
+```
+
+> Want a live GIF? Record one in seconds with [`vhs`](https://github.com/charmbracelet/vhs) or
+> [`asciinema`](https://asciinema.org), then drop it in this section.
+
 ## The problem it solves
 
 These aren't edge cases — they're the most frequent, most-viewed questions on
