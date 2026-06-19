@@ -1,0 +1,12 @@
+{
+  "$comment": "Optional. /diagnose-tx works best with a Solana RPC MCP so it can fetch and decode failed transactions. Copy to .mcp.json (or merge into your existing one) and add your key. The skill also functions without an MCP — it will ask you to paste `solana confirm -v <sig>` output instead.",
+  "mcpServers": {
+    "helius": {
+      "command": "npx",
+      "args": ["-y", "@helius-labs/mcp"],
+      "env": {
+        "HELIUS_API_KEY": "YOUR_HELIUS_API_KEY"
+      }
+    }
+  }
+}

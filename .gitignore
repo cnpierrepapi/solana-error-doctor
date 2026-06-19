@@ -1,0 +1,8 @@
+# local MCP config may contain API keys — never commit it (ship the .example instead)
+.mcp.json
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+node_modules/

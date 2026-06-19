@@ -1,0 +1,235 @@
+{
+  "$comment": "Machine-readable symptom -> chapter map for the Solana Error Doctor. Match `signals` against the user's pasted error text (case-insensitive substring) or `codes` against a numeric/hex program error code, then open the chapter file and jump to the anchor. Ordered most-frequent first within each layer.",
+  "version": "2026.06",
+  "anchor_error_code_base": {
+    "framework_errors": "2000-3999 (Anchor's own constraint/account errors)",
+    "custom_errors": "6000+ (0x1770+) — your program's #[error_code] enum, in declaration order",
+    "note": "Hex shown in logs: 6000=0x1770, 6001=0x1771, 2006=0x7d6, 2003=0x7d3, 3012=0x bc4. Convert hex->dec to map."
+  },
+  "entries": [
+    {
+      "id": "constraint-seeds",
+      "signals": ["A seeds constraint was violated", "ConstraintSeeds", "seeds constraint", "0x7d6", "error code 2006"],
+      "codes": [2006],
+      "layer": "program-runtime",
+      "chapter": "program-anchor.md#seeds-constraint",
+      "one_line": "Client-derived PDA != on-chain seeds=[...]: seed order, byte encoding, or missing/extra bump."
+    },
+    {
+      "id": "has-one",
+      "signals": ["A has one constraint was violated", "ConstraintHasOne", "0x7d3", "error code 2003"],
+      "codes": [2003],
+      "layer": "program-runtime",
+      "chapter": "program-anchor.md#has-one",
+      "one_line": "The field on the loaded account doesn't equal the key of the account passed for it."
+    },
+    {
+      "id": "account-not-deserialize",
+      "signals": ["AccountDidNotDeserialize", "Failed to deserialize the account", "account discriminator", "0xbba", "error code 3002", "AccountDiscriminatorMismatch", "3003"],
+      "codes": [3002, 3003],
+      "layer": "program-runtime",
+      "chapter": "program-anchor.md#discriminator",
+      "one_line": "Wrong account type/layout, or struct changed without migration — 8-byte discriminator or field layout mismatch."
+    },
+    {
+      "id": "account-space",
+      "signals": ["data too small", "AccountDataTooSmall", "failed to serialize", "AccountDidNotSerialize", "not enough space", "Trying to serialize"],
+      "codes": [3004],
+      "layer": "program-runtime",
+      "chapter": "program-anchor.md#space",
+      "one_line": "`space` omitted the 8-byte discriminator or undersized a field. Use 8 + InitSpace."
+    },
+    {
+      "id": "missing-signer",
+      "signals": ["missing required signature", "Signature verification failed", "ConstraintSigner", "an account required to sign", "0x7d2", "error code 2002"],
+      "codes": [2002],
+      "layer": "program-runtime",
+      "chapter": "program-anchor.md#signer-owner",
+      "one_line": "An account marked Signer wasn't passed as a signer, or a PDA tried to sign without invoke_signed."
+    },
+    {
+      "id": "pda-cpi-signing",
+      "signals": ["invoke_signed", "Cross-program invocation with unauthorized signer", "privilege escalation", "signer privilege escalated"],
+      "codes": [],
+      "layer": "program-runtime",
+      "chapter": "program-anchor.md#cpi-signing",
+      "one_line": "PDA CPI needs the exact seeds+bump in invoke_signed; a normal account can't escalate to signer."
+    },
+    {
+      "id": "realloc-rent",
+      "signals": ["realloc", "AccountNotRentExempt", "insufficient funds for rent", "resize", "10240"],
+      "codes": [],
+      "layer": "program-runtime",
+      "chapter": "program-anchor.md#realloc",
+      "one_line": "Resize is capped at +10,240 bytes/instr and the account must stay rent-exempt — top up lamports."
+    },
+    {
+      "id": "lockfile-v4",
+      "signals": ["lock file version 4", "lock file version `4`", "-Znext-lockfile-bump", "requires `-Z", "lockfile"],
+      "codes": [],
+      "layer": "build",
+      "chapter": "toolchain-build.md#lockfile-v4",
+      "one_line": "System Cargo (>=1.83) wrote a v4 Cargo.lock that build-sbf's bundled old Cargo can't parse."
+    },
+    {
+      "id": "edition2024",
+      "signals": ["edition2024", "feature `edition2024` is required", "edition 2024", "requires rustc 1.85", "is required to be enabled"],
+      "codes": [],
+      "layer": "build",
+      "chapter": "toolchain-build.md#edition2024",
+      "one_line": "A transitive crate needs Rust 1.85; platform-tools Rust is older. Use latest toolchain or the MSRV resolver."
+    },
+    {
+      "id": "sbpf-not-enabled",
+      "signals": ["sbpf_version", "sbpf version", "which are not enabled", "Detected sbpf_version required by the executable"],
+      "codes": [],
+      "layer": "build",
+      "chapter": "toolchain-build.md#sbpf",
+      "one_line": "Build emitted an sBPF VM version newer than the cluster enables. Build with `--arch` matched to the cluster."
+    },
+    {
+      "id": "program-id-mismatch",
+      "signals": ["DeclaredProgramIdMismatch", "declared program id", "0x1004", "error code 4100", "program id mismatch", "keys sync"],
+      "codes": [4100],
+      "layer": "build",
+      "chapter": "toolchain-build.md#program-id",
+      "one_line": "declare_id! != the keypair in target/deploy. Run `anchor keys sync` and rebuild."
+    },
+    {
+      "id": "workspace-error",
+      "signals": ["current package believes it's in a workspace", "believes it's in a workspace when it's not", "this may be fixable by adding `[workspace]`"],
+      "codes": [],
+      "layer": "build",
+      "chapter": "toolchain-build.md#workspace",
+      "one_line": "A standalone crate inside a repo with a root workspace. Add an empty [workspace] to its Cargo.toml."
+    },
+    {
+      "id": "version-mismatch",
+      "signals": ["requires rustc", "proc_macro2", "source_file", "unexpected cfg", "winnow", "build_hasher", "feature `edition", "package requires", "cannot be built because it requires"],
+      "codes": [],
+      "layer": "build",
+      "chapter": "toolchain-build.md#version-matrix",
+      "one_line": "Anchor <-> Agave <-> rustc version skew. Align to a known-good matrix (see chapter)."
+    },
+    {
+      "id": "blockhash-not-found",
+      "signals": ["Blockhash not found", "BlockhashNotFound", "blockhash expired", "block height exceeded", "BlockHeightExceeded", "TransactionExpiredBlockheightExceeded"],
+      "codes": [],
+      "layer": "network",
+      "chapter": "transactions.md#blockhash",
+      "one_line": "The blockhash aged out (~151 blocks / 60-90s) before the tx landed, or commitment/RPC mismatch."
+    },
+    {
+      "id": "tx-not-landing",
+      "signals": ["transaction not landing", "tx dropped", "not confirmed", "transactions not confirmed", "stuck pending", "priority fee", "didn't land", "never confirms"],
+      "codes": [],
+      "layer": "network",
+      "chapter": "transactions.md#landing",
+      "one_line": "No/low priority fee, default 200k CU, RPC retry off, or outbid. Use the 5-step landing recipe."
+    },
+    {
+      "id": "compute-budget",
+      "signals": ["exceeded CUs", "compute budget exceeded", "exceeded maximum number of instructions", "ComputeBudgetExceeded", "out of compute", "consumed", "compute units"],
+      "codes": [],
+      "layer": "network",
+      "chapter": "transactions.md#compute",
+      "one_line": "Ran past the CU limit (default 200k). Simulate to size, then setComputeUnitLimit."
+    },
+    {
+      "id": "tx-too-large",
+      "signals": ["Transaction too large", "encoded/raw", "exceeds packet data size", "1232", "too many accounts"],
+      "codes": [],
+      "layer": "network",
+      "chapter": "transactions.md#alt",
+      "one_line": "Past the 1232-byte cap. Move to a v0 transaction with Address Lookup Tables."
+    },
+    {
+      "id": "getprogramaccounts-timeout",
+      "signals": ["getProgramAccounts", "gPA", "504", "request took too long", "too much data", "scan", "timeout fetching accounts"],
+      "codes": [],
+      "layer": "client",
+      "chapter": "rpc-data.md#gpa",
+      "one_line": "Unfiltered gPA scans the whole program. Add memcmp+dataSlice, or use getProgramAccountsV2 / DAS."
+    },
+    {
+      "id": "rpc-429",
+      "signals": ["429", "Too Many Requests", "rate limit", "rate-limited", "Retry-After"],
+      "codes": [],
+      "layer": "client",
+      "chapter": "rpc-data.md#rate-limits",
+      "one_line": "Public RPC throttling. Use a dedicated endpoint; batch; back off; avoid hot polling."
+    },
+    {
+      "id": "transfer-checked",
+      "signals": ["transfer vs transferChecked", "transferChecked", "invalid mint", "decimals", "owner does not match", "0x4", "TokenError"],
+      "codes": [],
+      "layer": "client",
+      "chapter": "tokens.md#transfer-checked",
+      "one_line": "Prefer transfer_checked (validates mint+decimals); classic transfer is deprecated in spirit."
+    },
+    {
+      "id": "ata-owner",
+      "signals": ["provided owner is not allowed", "InvalidOwner", "associated token", "ATA", "TokenAccountNotFoundError", "could not find account"],
+      "codes": [],
+      "layer": "client",
+      "chapter": "tokens.md#ata",
+      "one_line": "ATA owner must be a system account or an off-curve PDA (allowOwnerOffCurve); account may not exist yet."
+    },
+    {
+      "id": "token2022",
+      "signals": ["Token-2022", "TokenExtensions", "transfer fee", "transfer hook", "TransferFeeConfig", "extension", "TokenkegQ", "Tokenz"],
+      "codes": [],
+      "layer": "client",
+      "chapter": "tokens.md#token-2022",
+      "one_line": "Token-2022 needs the right program id + extension accounts; transfer-fee/hook change amounts and account lists."
+    },
+    {
+      "id": "buffer-not-defined",
+      "signals": ["Buffer is not defined", "process is not defined", "global is not defined", "ReferenceError: Buffer"],
+      "codes": [],
+      "layer": "browser",
+      "chapter": "frontend-wallet.md#buffer",
+      "one_line": "Browser bundler (Vite/webpack5/Next) lacks Node polyfills. Provide a Buffer polyfill."
+    },
+    {
+      "id": "bigint-bindings",
+      "signals": ["bigint: Failed to load bindings", "pure JS will be used", "node-gyp", "bigint-buffer"],
+      "codes": [],
+      "layer": "browser",
+      "chapter": "frontend-wallet.md#bigint",
+      "one_line": "Harmless native-binding warning from bigint-buffer; silence it or ignore — not a real error."
+    },
+    {
+      "id": "wallet-adapter-ssr",
+      "signals": ["window is not defined", "Hydration failed", "createContext is not a function", "document is not defined", "self is not defined"],
+      "codes": [],
+      "layer": "browser",
+      "chapter": "frontend-wallet.md#ssr",
+      "one_line": "Wallet providers ran during SSR. Make them client-only / dynamic import with ssr:false."
+    },
+    {
+      "id": "test-validator",
+      "signals": ["solana-test-validator", "blockstore error", "ledger", "validator exited", "Unable to start"],
+      "codes": [],
+      "layer": "testing",
+      "chapter": "testing.md#validator",
+      "one_line": "Local validator flaky/stale ledger. Clear the ledger, or move to LiteSVM/Surfpool."
+    },
+    {
+      "id": "bankrun-deprecated",
+      "signals": ["bankrun", "solana-bankrun", "deprecated", "litesvm", "migrate test"],
+      "codes": [],
+      "layer": "testing",
+      "chapter": "testing.md#litesvm",
+      "one_line": "solana-bankrun is deprecated; migrate to LiteSVM (in-process SVM, fast, deterministic)."
+    },
+    {
+      "id": "oracle-stale",
+      "signals": ["price update not found", "stale price", "PriceTooOld", "confidence", "Pyth", "Switchboard", "oracle", "no price", "price is zero"],
+      "codes": [],
+      "layer": "oracles",
+      "chapter": "oracles.md",
+      "one_line": "Pyth Pull/Switchboard On-Demand require posting a fresh update and checking staleness + confidence before use."
+    }
+  ]
+}
