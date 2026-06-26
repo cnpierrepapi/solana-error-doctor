@@ -100,7 +100,7 @@ error code (Anchor `2000–3999`, custom `6000+`) and jump straight to the fix.
 ## Install
 
 ```bash
-git clone https://github.com/<your-org>/solana-error-doctor
+git clone https://github.com/cnpierrepapi/solana-error-doctor
 cd solana-error-doctor
 ./install.sh                 # installs into ~/.claude (or: ./install.sh /path/to/.claude)
 ```
